@@ -53,6 +53,22 @@ namespace MangaReader.Models
                         LastRead DATETIME DEFAULT CURRENT_TIMESTAMP
                     )";
 
+                    string createMangaInfoTable = @"
+CREATE TABLE IF NOT EXISTS MangaInfo (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    MangaName TEXT NOT NULL UNIQUE,
+    Title TEXT,
+    Author TEXT,
+    ReleaseYear INTEGER,
+    Description TEXT,
+    CoverImagePath TEXT,
+    LastUpdated DATETIME DEFAULT CURRENT_TIMESTAMP
+)";
+                    using (var command = new SQLiteCommand(createMangaInfoTable, connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+
                     using (var command = new SQLiteCommand(createUsersTable, connection))
                     {
                         command.ExecuteNonQuery();

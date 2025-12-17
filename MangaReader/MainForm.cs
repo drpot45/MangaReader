@@ -36,6 +36,24 @@ namespace MangaReader
             fileMenu.DropDownItems.Add("Exit", null, (s, e) => Application.Exit());
             menuStrip.Items.Add(fileMenu);
 
+            // In MainForm constructor, after currentUser is assigned
+            if (currentUser.IsAdmin)
+            {
+                // Find your existing MenuStrip (assumes it's named 'menuStrip')
+                // Create a new "Admin" menu item
+                var adminMenu = new ToolStripMenuItem("Administration");
+
+                // Add a sub-item to open User Management
+                adminMenu.DropDownItems.Add("Manage Users", null, (s, e) =>
+                {
+                    var userMgmtForm = new UserManagementForm(currentUser);
+                    userMgmtForm.ShowDialog(); // Show as a modal dialog
+                });
+
+                // Add the admin menu to the main menu strip
+                menuStrip.Items.Add(adminMenu);
+            }
+
             // Controls
             btnSetPath = new Button
             {
@@ -184,23 +202,20 @@ namespace MangaReader
             }
         }
 
+        // In MainForm.cs, in the OpenManga method:
         private void OpenManga(string mangaName)
         {
             var mangaPath = Path.Combine(currentUser.LibraryPath, mangaName);
 
-            // Check if manga has chapters (subfolders)
-            var chapterFolders = Directory.GetDirectories(mangaPath);
+            // Get list of all manga for navigation
+            var allManga = Directory.GetDirectories(currentUser.LibraryPath)
+                                   .Select(Path.GetFileName)
+                                   .ToList();
 
-            if (chapterFolders.Length > 0)
-            {
-                // Show chapter selection
-                var chapterForm = new ChapterSelectionForm(mangaName, mangaPath, currentUser);
-                chapterForm.ShowDialog();
-            }
-            else
-            {
-                MessageBox.Show("No chapters found in this manga folder. Each manga should have chapter subfolders.");
-            }
+            // Open the enhanced form
+            var chapterForm = new ChapterSelectionForm(currentUser, mangaName, mangaPath, allManga);
+            chapterForm.ShowDialog();
         }
     }
+    
 }
